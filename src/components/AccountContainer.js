@@ -6,12 +6,27 @@ import AddTransactionForm from "./AddTransactionForm";
 function AccountContainer() {
   const [transaction, setTransaction] = useState([])
 
-  useEffect(()=> {getData()},[])
+  const [myData, setMyData] = useState("")
+  function handleDataChange(e){
+    setMyData(e.target.value)
+    filterData()
+  }
+
+  useEffect(()=> {
+    getData()
+    
+    
+  },[])
+
+ 
 
   const getData =() => {
     fetch('http://localhost:8001/transactions')
     .then((response)=> response.json())
-    .then(data => setTransaction(data)) 
+    .then(data => setTransaction(data))
+    if(myData !== ""){
+      filterData()
+    } 
   }
 function createDataInput(data){
   fetch('http://localhost:8001/transactions', {
@@ -25,9 +40,23 @@ function createDataInput(data){
 .then(() => window.location.reload());
 
 }
+
+ // filtering data
+ function filterData(){
+  const dataFilter = transaction.filter((transaction)=>{
+    let description = transaction.description.toLowerCase()
+    let category = transaction.category.toLowerCase()
+   
+
+    return description.includes(myData.toLowerCase())|| category.includes(myData.toLowerCase())
+
+  })
+setTransaction(dataFilter)
+}
+console.log(transaction);
   return (
     <div>
-      <Search />
+      <Search searchData={handleDataChange}/>
       <AddTransactionForm myDataInput={createDataInput}/>
       <TransactionsList transactions={transaction}/>
     </div>
